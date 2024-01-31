@@ -1,8 +1,10 @@
-from .ising_metropolis import IsingMetropolis
-import numpy as np
-import torch
 
-class IsingHMC(IsingMetropolis):
+from .monte_carlo import MonteCarlo
+import numpy as np
+
+
+
+class IsingHMC(MonteCarlo):
 
     def __init__(self, ising_state, integrator, autograd=False):
         
