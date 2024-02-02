@@ -3,17 +3,26 @@ from scipy.sparse import coo_matrix
 
 class GridState:
 
-    def __init__(self, dim, length):
+    def __init__(self, dim, length, dtype="real"):
+        
         self.dim = dim
         self.length = length
         self.n_sites = length**dim
         self.n_neighbours = 2**dim
-        self._init_sites()
         self._init_neighbours()
+        
+        # spin are real valued or int valued
+        self.dtype = dtype
+        self._init_sites(self.dtype)
+        
 
-    def _init_sites(self):
+    def _init_sites(self, dtype):
         # self.sites = np.ones(shape=(self.n_sites), dtype=np.float)
-        self.sites = np.random.randn(self.n_sites)
+        if dtype == "int":
+            # generate sequence of [0,1,0,1,0,0...]
+            self.sites = np.random.randint(2, size=self.n_sites)
+        if dtype == "real" or dtype== "float":
+            self.sites = np.random.randn(self.n_sites)
 
     
     def _get_flatten_index(self, grid_index):
@@ -60,9 +69,9 @@ class GridState:
         adjacent = coo_matrix((data, (row, col))).toarray()
         return adjacent
 
-    def get_state_vector(self):
+    def get_state(self):
         return self.sites
 
-    def set_state_vector(self, new_state):
+    def set_state(self, new_state):
         self.sites = new_state
 
