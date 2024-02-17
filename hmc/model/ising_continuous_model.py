@@ -1,30 +1,25 @@
 import numpy as np
 import torch
+from .spin_model import SpinModel
 
-class IsingContinuousState:
+class IsingContinuousModel(SpinModel):
 
     def __init__(self, grid_state, J=1, h=0, beta=1):
-
+        super().__init__(grid_state, J, h, beta)
         
-        self.grid = grid_state
-        self._init_spins()
-        
-        self.J = J # coupling between spins
-        self.h= h*np.ones(shape=(self.grid.n_sites),dtype=float) # external field
-        self.beta=beta # inverse temperature
-        self.K = self.grid.get_adjacent_matrix() # adjacent matrix
         self._init_effective_parameters()
 
 
     def _init_spins(self):
-        self.grid.sites = np.random.randn(self.grid.n_sites)
+        psi = np.random.randn(self.grid.n_sites)
+        self.set_state(psi)
 
     def _init_effective_parameters(self):
         # constant C ensures K+CI is positive definite
         self.C = self.grid.n_neighbours + 1e-3 
         self.K_prime = self.K + self.C * np.identity(self.grid.n_sites, dtype=np.float)
-        self.J_prime = self.beta * self.J
-        self.h_prime = self.beta * self.h 
+        self.J_prime = self.J * self.beta
+        self.h_prime = self.h * self.beta
 
 
     def get_average(self,psi):
@@ -37,6 +32,11 @@ class IsingContinuousState:
         return magnetization
     
 
+    def get_energy(self, psi):
+        return self.get_potential(psi)/self.beta
+        
+    # in HMC, the energy is treated as potential energy. 
+    # The virtue kinetic energy comes from virtue momentum
     def get_potential(self, psi):
         spin_interaction = 0.5 * self.J_prime * np.dot(psi, self.K_prime @ psi)
         log_cosh  = -np.sum(np.log(np.cosh(self.J_prime*(self.K_prime @ psi)+self.h_prime)))

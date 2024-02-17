@@ -14,3 +14,4 @@ hmc/monte_carlo/__pycache__/ising_hmc_autograd.cpython-39.pyc
 hmc/monte_carlo/__pycache__/__init__.cpython-39.pyc
 hmc/integrator/__pycache__/leap_frog.cpython-39.pyc
 *.pyc
+deep_learning_models/best_TrainLoss_joint.saving

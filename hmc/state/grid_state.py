@@ -13,16 +13,16 @@ class GridState:
         
         # spin are real valued or int valued
         self.dtype = dtype
-        self._init_sites(self.dtype)
+        self._init_state(self.dtype)
         
 
-    def _init_sites(self, dtype):
+    def _init_state(self, dtype):
         # self.sites = np.ones(shape=(self.n_sites), dtype=np.float)
         if dtype == "int":
             # generate sequence of [0,1,0,1,0,0...]
-            self.sites = np.random.randint(2, size=self.n_sites)
+            self.state = np.random.randint(2, size=self.n_sites)
         if dtype == "real" or dtype== "float":
-            self.sites = np.random.randn(self.n_sites)
+            self.state = np.random.randn(self.n_sites)
 
     
     def _get_flatten_index(self, grid_index):
@@ -58,10 +58,10 @@ class GridState:
         row = []
         col = []
         data = []
-        for site in range(self.n_sites):
+        for site_id in range(self.n_sites):
             for i in range(self.n_neighbours):
-                row.append(site)
-                col.append(self.neighbours[site,i])
+                row.append(site_id)
+                col.append(self.neighbours[site_id,i])
                 data.append(1)
         data = np.array(data)
         row = np.array(row)
@@ -70,8 +70,8 @@ class GridState:
         return adjacent
 
     def get_state(self):
-        return self.sites
+        return self.state
 
     def set_state(self, new_state):
-        self.sites = new_state
+        self.state = new_state
 
