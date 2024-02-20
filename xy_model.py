@@ -19,7 +19,7 @@ def measure(beta_list):
         model = XYModel(grid_state=grid,beta=beta, J=J, h=h) # define ising state
         mc = XYHMC(ising_model=model,integrator=leap_frog) # define Monte Carlo algorithm
         measurements = {"magnetization": model.get_magnetization, "energy":model.get_energy} # define physics observable to be measured
-        history = mc.sample(measurements=measurements,n_samples=4000,n_iters_per_sample=100,n_thermalization_iters=4000)
+        history = mc.sample(measurements=measurements,n_samples=10000,n_iters_per_sample=100,n_thermalization_iters=10000)
         
         energy_list.append(np.mean(history["energy"])/model.grid.n_sites)
         magnetization_list.append(np.mean(history["magnetization"]))
@@ -58,6 +58,6 @@ if __name__ == "__main__":
 
     measurement  = measure(beta_list)
     df = pd.DataFrame(data=measurement)
-    filename = "./data/xy_model.csv"
+    filename = "./data/xy_model_less_points.csv"
     df.to_csv(filename)
         
