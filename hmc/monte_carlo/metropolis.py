@@ -34,7 +34,6 @@ class FlowXYMetropolis(MonteCarlo):
 
     def __init__(self, ising_model, state_generator):
         self.model = ising_model
-        self.initial_state = ising_model.grid.get_state()
         self.state_generator = state_generator
        
     def get_delta_energy(self, psi, new_psi):
@@ -52,11 +51,17 @@ class FlowXYMetropolis(MonteCarlo):
         delta_energy = self.get_delta_energy(psi, new_psi)
         delta_log_prob = new_log_prob - log_prob
         beta = self.model.beta
-        if np.random.rand() < np.exp(-delta_energy*beta - delta_log_prob):
+        log_accept_ratio = -delta_energy*beta - delta_log_prob
+        if np.random.rand() < np.exp(log_accept_ratio):
             return new_psi, new_log_prob
         else:
             return psi, log_prob
     
+    def thermalize(self, psi, log_prob, n_iters=10000):
+            for _ in range(n_iters):
+                psi, log_prob = self.update(psi, log_prob)
+            return psi, log_prob
+
     def sample(self, measurements, n_samples=500, n_iters_per_sample=10, n_thermalization_iters=0):
         # measurements is a dict store the functions of psi
         # e.g.: {"magnetization": get_magnetization, "energy", get_energy}
@@ -67,8 +72,8 @@ class FlowXYMetropolis(MonteCarlo):
         for key in measurements.keys():
             result_dict[key] = []
 
-        psi = self.initial_state
-        psi = self.thermalize(psi,n_thermalization_iters)
+        psi, log_prob = self.state_generator.generate()
+        psi, log_prob = self.thermalize(psi, log_prob, n_thermalization_iters)
         for _ in range(n_samples):
 
             for key, measurement_func in measurements.items():

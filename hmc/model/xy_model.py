@@ -10,14 +10,14 @@ class XYModel(SpinModel):
         super().__init__(grid_state, J, h, beta)
     
     # theta range from -pi to pi
-    def confine_theta(theta):
+    def confine_theta(self, theta):
         return np.mod(theta, np.pi*2) - np.pi
 
     def _init_spins(self):
         # range [0, 2 pi]
         theta = np.random.randn(self.grid.n_sites) * 2 * np.pi
         # range [-pi, pi]
-        theta = XYModel.confine_theta(theta)
+        theta = self.confine_theta(theta)
         self.set_state(theta)
     
     # scalar magnetization

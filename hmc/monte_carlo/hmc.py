@@ -53,4 +53,12 @@ class IsingHMC(MonteCarlo):
 
 
 
+class XYHMC(IsingHMC):
+
     
+    def update(self, psi):
+        
+        new_psi = super().update(psi)
+        new_psi = self.model.confine_theta(new_psi)
+        return new_psi
+       
